@@ -10,7 +10,7 @@ public class Player {
 	
 	private float speed;
 	private float topSpeed = 10;
-	private float bottomSpeed = -2;
+	private float bottomSpeed = -5;
 	private Vector3D direction;
 	private Point3D position;
 	
@@ -32,9 +32,13 @@ public class Player {
 		this.position.y += deltaSpeed * this.direction.y;
 		this.position.z += deltaSpeed * this.direction.z;
 	}
-	
+
 	public Point3D getPos(){
 		return position;
+	}
+
+	public Vector3D getDir(){
+		return direction;
 	}
 
 	public MeshModel getModel(){
@@ -70,7 +74,12 @@ public class Player {
 		float radians = angle * (float)Math.PI / 180.0f;
 		float c = (float)Math.cos(radians);
 		float s = -(float)Math.sin(radians);
-//		Vector3D t = new Vector3D(u.x, u.y, u.z);
+		float xTemp = this.direction.x;
+
+		this.direction.x = xTemp * c + this.direction.z * s;
+		this.direction.z = -xTemp * s + this.direction.z * c;
+		
+		this.direction.normalize();
 //
 //		u.set(t.x * c - n.x * s, t.y * c - n.y * s, t.z * c - n.z * s);
 //		n.set(t.x * s + n.x * c, t.y * s + n.y * c, t.z * s + n.z * c);
