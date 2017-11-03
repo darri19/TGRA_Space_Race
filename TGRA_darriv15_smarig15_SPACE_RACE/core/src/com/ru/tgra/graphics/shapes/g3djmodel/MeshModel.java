@@ -23,7 +23,7 @@ public class MeshModel {
 		nodes = new Vector<MeshModelNode>();
 	}
 
-	public void draw(Shader shader, Texture diffuseTexture) {
+	public void draw(Shader shader, Texture diffuseTexture, float scale) {
 
 		for(MeshModelNode node : nodes)
 		{
@@ -32,6 +32,7 @@ public class MeshModel {
 			ModelMatrix.main.addTranslation(node.translation.x, node.translation.y, node.translation.z);
 			ModelMatrix.main.addRotationQuaternion(node.rotation.x, node.rotation.y, node.rotation.z, node.rotation.w);
 			ModelMatrix.main.addScale(node.scale.x, node.scale.y, node.scale .z);
+			ModelMatrix.main.addScale(scale,scale,scale);
 
 
 			shader.setModelMatrix(ModelMatrix.main.getMatrix());

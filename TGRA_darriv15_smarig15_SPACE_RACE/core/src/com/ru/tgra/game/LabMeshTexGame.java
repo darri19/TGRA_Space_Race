@@ -34,12 +34,14 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 	float currentTime;
 	boolean firstFrame = true;
 
-	MeshModel model;
+	MeshModel sky;
+	MeshModel ship;
+	
+	Player player1;
 	
 	BezierMotion motion;
-	Point3D modelPosition;
 
-	private Texture tex;
+	private Texture skyTex;
 	
 	Random rand = new Random();
 
@@ -49,19 +51,22 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		Gdx.input.setInputProcessor(this);
 
 		DisplayMode disp = Gdx.graphics.getDesktopDisplayMode();
-		//Gdx.graphics.setDisplayMode(disp.width, disp.height, true);
+		Gdx.graphics.setDisplayMode(disp.width, disp.height, true);
 
 		shader = new Shader();
 
-		tex = new Texture(Gdx.files.internal("textures/phobos2k.png"));
+		skyTex = new Texture(Gdx.files.internal("textures/spaceTex.png"));
 
-		model = G3DJModelLoader.loadG3DJFromFile("shit.g3dj", true);
+		sky = G3DJModelLoader.loadG3DJFromFile("space_less_detailed.g3dj", true);
+		ship = G3DJModelLoader.loadG3DJFromFile("ship_proto.g3dj", true);
 		
-		motion = new BezierMotion(new Point3D(-1,4,-1), new Point3D(1,6,1),
+		/*motion = new BezierMotion(new Point3D(-1,4,-1), new Point3D(1,6,1),
 								new Point3D(7,6,-4), new Point3D(1,3,1),
-								3.0f, 7.0f);
-		modelPosition = new Point3D(); 
+								3.0f, 7.0f);*/ 
 
+		player1 = new Player(new Point3D(1.0f,1.0f,1.0f), new Vector3D(0.0f,0.0f,1.0f), ship, null);
+		
+		
 		BoxGraphic.create();
 		SphereGraphic.create();
 
@@ -97,57 +102,61 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
-		
-		if(firstFrame){
-			currentTime = 0.0f;
-			firstFrame = false;
-		}else{
-			currentTime += Gdx.graphics.getRawDeltaTime();
-		}
+//		
+//		if(firstFrame){
+//			currentTime = 0.0f;
+//			firstFrame = false;
+//		}else{
+//			currentTime += Gdx.graphics.getRawDeltaTime();
+//		}
 
 		angle += 180.0f * deltaTime;
+		cam.look(new Point3D(player1.getPos().x, player1.getPos().y+3,player1.getPos().z-6) , new Point3D(player1.getPos().x, player1.getPos().y+3,player1.getPos().z+4), new Vector3D(0,1,0));
 
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			cam.slide(-3.0f * deltaTime, 0, 0);
+			//cam.slide(-3.0f * deltaTime, 0, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-			cam.slide(3.0f * deltaTime, 0, 0);
+			//cam.slide(3.0f * deltaTime, 0, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-			cam.slide(0, 0, -3.0f * deltaTime);
+			player1.accelerateForward();
+			//cam.slide(0, 0, -3.0f * deltaTime);
 			//cam.walkForward(3.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-			cam.slide(0, 0, 3.0f * deltaTime);
+		}else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+			player1.accelerateBack();
+			//cam.slide(0, 0, 3.0f * deltaTime);
 			//cam.walkForward(-3.0f * deltaTime);
+		}else{
+			player1.decelerate();
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.R)) {
-			cam.slide(0, 3.0f * deltaTime, 0);
+			//cam.slide(0, 3.0f * deltaTime, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.F)) {
-			cam.slide(0, -3.0f * deltaTime, 0);
+			//cam.slide(0, -3.0f * deltaTime, 0);
 		}
 
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			cam.yaw(-90.0f * deltaTime);
+			//cam.yaw(-90.0f * deltaTime);
 			//cam.rotateY(90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			cam.yaw(90.0f * deltaTime);
+			//cam.yaw(90.0f * deltaTime);
 			//cam.rotateY(-90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			cam.pitch(-90.0f * deltaTime);
+			//cam.pitch(-90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			cam.pitch(90.0f * deltaTime);
+			//cam.pitch(90.0f * deltaTime);
 		}
 
 		if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			cam.roll(-90.0f * deltaTime);
+			//cam.roll(-90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.E)) {
-			cam.roll(90.0f * deltaTime);
+			//cam.roll(90.0f * deltaTime);
 		}
 
 		if(Gdx.input.isKeyPressed(Input.Keys.T)) {
@@ -164,7 +173,8 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		}
 
 		//do all updates to the game
-		motion.getCurrentPos(currentTime, modelPosition);
+		//motion.getCurrentPos(currentTime, modelPosition);
+		player1.update();
 	}
 	
 	private void display()
@@ -232,7 +242,7 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 			//shader.setLightColor(s2, 0.4f, c2, 1.0f);
 			shader.setLightColor(1.0f, 1.0f, 1.0f, 1.0f);
 			
-			shader.setGlobalAmbient(0.3f, 0.3f, 0.3f, 1);
+			shader.setGlobalAmbient(1.0f, 1.0f, 1.0f, 1);
 
 			//shader.setMaterialDiffuse(s, 0.4f, c, 1.0f);
 			shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
@@ -243,17 +253,19 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 
 			ModelMatrix.main.pushMatrix();
 			//ModelMatrix.main.addTranslation(0.0f, 4.0f, 0.0f);
-			ModelMatrix.main.addTranslation(modelPosition.x, modelPosition.y, modelPosition.z);
+			ModelMatrix.main.addTranslation(player1.getPos().x, player1.getPos().y, player1.getPos().z);
 			//ModelMatrix.main.addRotation(angle, new Vector3D(1,1,1));
 			shader.setModelMatrix(ModelMatrix.main.getMatrix());
 
 			//BoxGraphic.drawSolidCube(shader, null);
 			//SphereGraphic.drawSolidSphere(shader, tex);
-			model.draw(shader, null);
+			sky.draw(shader, skyTex,100);
+			
+			player1.getModel().draw(shader, player1.getTex(),1);
 
 			ModelMatrix.main.popMatrix();
 	
-			//drawPyramids();
+			drawPyramids();
 		}
 	}
 
