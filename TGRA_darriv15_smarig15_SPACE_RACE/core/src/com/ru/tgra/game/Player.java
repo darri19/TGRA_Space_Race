@@ -9,10 +9,11 @@ import com.ru.tgra.graphics.shapes.g3djmodel.MeshModel;
 public class Player {
 	
 	private float speed;
-	private float topSpeed = 10;
+	private float topSpeed = 30;
 	private float bottomSpeed = -5;
 	private Vector3D direction;
 	private Point3D position;
+	private float angle;
 	
 	private MeshModel model;
 	private Texture tex;
@@ -24,6 +25,7 @@ public class Player {
 		this.model = model;
 		this.tex = tex;
 		this.speed = 0;
+		this.angle = 0;
 	}
 	
 	public void update(){
@@ -39,6 +41,10 @@ public class Player {
 
 	public Vector3D getDir(){
 		return direction;
+	}
+	
+	public float getAngle(){
+		return angle;
 	}
 
 	public MeshModel getModel(){
@@ -71,6 +77,7 @@ public class Player {
 	
 	public void rotate(float angle){
 
+		this.angle -= angle;
 		float radians = angle * (float)Math.PI / 180.0f;
 		float c = (float)Math.cos(radians);
 		float s = -(float)Math.sin(radians);
@@ -83,9 +90,5 @@ public class Player {
 //
 //		u.set(t.x * c - n.x * s, t.y * c - n.y * s, t.z * c - n.z * s);
 //		n.set(t.x * s + n.x * c, t.y * s + n.y * c, t.z * s + n.z * c);
-	}
-	
-	public void turn(){
-		
 	}
 }

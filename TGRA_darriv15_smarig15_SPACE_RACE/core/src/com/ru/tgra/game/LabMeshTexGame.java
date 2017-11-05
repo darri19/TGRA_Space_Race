@@ -1,6 +1,8 @@
 package com.ru.tgra.game;
 
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -19,6 +21,9 @@ import com.ru.tgra.graphics.motion.LinearMotion;
 import com.ru.tgra.graphics.shapes.*;
 import com.ru.tgra.graphics.shapes.g3djmodel.G3DJModelLoader;
 import com.ru.tgra.graphics.shapes.g3djmodel.MeshModel;
+
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor {
 
@@ -100,6 +105,10 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		tex = new Texture(pm);*/
 
 		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		
+		long soundId = SoundManager.music.play();
+		SoundManager.music.setLooping(soundId, true);
+		SoundManager.music.setVolume(soundId, 0.15f);
 	}
 
 	private void input()
@@ -118,14 +127,14 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 //		}
 
 		angle += 180.0f * deltaTime;
-		cam.look(new Point3D(player1.getPos().x, player1.getPos().y+3,player1.getPos().z-6) , new Point3D(player1.getPos().x, player1.getPos().y+3,player1.getPos().z+4), new Vector3D(0,1,0));
-		cam2.look(new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z-6) , new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z+4), new Vector3D(0,1,0));
+		cam.look(new Point3D(player1.getPos().x - 6*player1.getDir().x, player1.getPos().y+5,player1.getPos().z-6*player1.getDir().z) , new Point3D(player1.getPos().x + 6*player1.getDir().x, player1.getPos().y,player1.getPos().z+ 6*player1.getDir().z), new Vector3D(0,1,0));
+		cam2.look(new Point3D(player2.getPos().x - 6*player2.getDir().x, player2.getPos().y+5,player2.getPos().z-6*player2.getDir().z) , new Point3D(player2.getPos().x + 6*player2.getDir().x, player1.getPos().y,player2.getPos().z+ 6*player2.getDir().z), new Vector3D(0,1,0));
+//		cam2.look(new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z-6) , new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z+4), new Vector3D(0,1,0));
 
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
 			player1.rotate(-1);
 			//cam.slide(-3.0f * deltaTime, 0, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+		}else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
 			player1.rotate(1);
 			//cam.slide(3.0f * deltaTime, 0, 0);
 		}
@@ -151,8 +160,7 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 			player2.rotate(-1);
 			//cam.yaw(-90.0f * deltaTime);
 			//cam.rotateY(90.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 			player2.rotate(1);
 			//cam.yaw(90.0f * deltaTime);
 			//cam.rotateY(-90.0f * deltaTime);
@@ -215,93 +223,68 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 				shader.setViewMatrix(cam.getViewMatrix());
 				shader.setProjectionMatrix(cam.getProjectionMatrix());
 				shader.setEyePosition(cam.eye.x, cam.eye.y, cam.eye.z, 1.0f);
+
+				ModelMatrix.main.loadIdentityMatrix();
+
+				setLights();
+
+				drawPlayer(player1);
+				drawPlayer(player2);
+
+				drawSkybox();
+				drawPyramids();
 			}
 			else
 			{
-//				Gdx.gl.glViewport(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
-//				topCam.look(new Point3D(cam.eye.x, 20.0f, cam.eye.z), cam.eye, new Vector3D(0,0,-1));
-//				//orthoCam.look(new Point3D(7.0f, 40.0f, -7.0f), new Point3D(7.0f, 0.0f, -7.0f), new Vector3D(0,0,-1));
-//				topCam.perspectiveProjection(30.0f, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 3, 100);
-//				shader.setViewMatrix(topCam.getViewMatrix());
-//				shader.setProjectionMatrix(topCam.getProjectionMatrix());
-//				shader.setEyePosition(topCam.eye.x, topCam.eye.y, topCam.eye.z, 1.0f);
 				Gdx.gl.glViewport(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
-				//orthoCam.look(new Point3D(7.0f, 40.0f, -7.0f), new Point3D(7.0f, 0.0f, -7.0f), new Vector3D(0,0,-1));
 				cam2.perspectiveProjection(fov, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 3, 100);
 				shader.setViewMatrix(cam2.getViewMatrix());
 				shader.setProjectionMatrix(cam2.getProjectionMatrix());
 				shader.setEyePosition(cam2.eye.x, cam2.eye.y, cam2.eye.z, 1.0f);
+
+				ModelMatrix.main.loadIdentityMatrix();
+
+				setLights();
+				
+				drawPlayer(player1);
+				drawPlayer(player2);
+
+				drawSkybox();
+				drawPyramids();
 			}
 
-	
-			//BoxGraphic.drawOutlineCube();
-			//SphereGraphic.drawSolidSphere();
-			//SphereGraphic.drawOutlineSphere();
 
-
-			ModelMatrix.main.loadIdentityMatrix();
-
-			//ModelMatrix.main.addRotationZ(angle);
-
-			float s = (float)Math.sin((angle / 2.0) * Math.PI / 180.0);
-			float c = (float)Math.cos((angle / 2.0) * Math.PI / 180.0);
-
-			//shader.setLightPosition(0.0f + c * 3.0f, 5.0f, 0.0f + s * 3.0f, 1.0f);
-			//shader.setLightPosition(3.0f, 4.0f, 0.0f, 1.0f);
-			//shader.setLightPosition(cam.eye.x, cam.eye.y, cam.eye.z, 1.0f);
-
-
-			float s2 = Math.abs((float)Math.sin((angle / 1.312) * Math.PI / 180.0));
-			float c2 = Math.abs((float)Math.cos((angle / 1.312) * Math.PI / 180.0));
-
-			shader.setSpotDirection(s2, -0.3f, c2, 0.0f);
-			//shader.setSpotDirection(-cam.n.x, -cam.n.y, -cam.n.z, 0.0f);
-			shader.setSpotExponent(0.0f);
-			shader.setConstantAttenuation(1.0f);
-			shader.setLinearAttenuation(0.00f);
-			shader.setQuadraticAttenuation(0.00f);
-
-			//shader.setLightColor(s2, 0.4f, c2, 1.0f);
-			shader.setLightColor(1.0f, 1.0f, 1.0f, 1.0f);
-			
-			shader.setGlobalAmbient(1.0f, 1.0f, 1.0f, 1);
-
-			//shader.setMaterialDiffuse(s, 0.4f, c, 1.0f);
-			shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
-			shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-			//shader.setMaterialSpecular(0.0f, 0.0f, 0.0f, 1.0f);
-			shader.setMaterialEmission(0, 0, 0, 1);
-			shader.setShininess(50.0f);
-
-			ModelMatrix.main.pushMatrix();
-			//ModelMatrix.main.addTranslation(0.0f, 4.0f, 0.0f);
-			ModelMatrix.main.addTranslation(player1.getPos().x, player1.getPos().y, player1.getPos().z);
-			//ModelMatrix.main.addRotation(angle, new Vector3D(1,1,1));
-			//ModelMatrix.main.addRotation(angle, player1.getDir());
-			shader.setModelMatrix(ModelMatrix.main.getMatrix());
-
-			//BoxGraphic.drawSolidCube(shader, null);
-			//SphereGraphic.drawSolidSphere(shader, tex);
-			
-
-			player1.getModel().draw(shader, player1.getTex(),1);
-
-			ModelMatrix.main.popMatrix();
-			
-
-			ModelMatrix.main.pushMatrix();
-			//ModelMatrix.main.addTranslation(0.0f, 4.0f, 0.0f);
-			ModelMatrix.main.addTranslation(player2.getPos().x, player2.getPos().y, player2.getPos().z);
-			//ModelMatrix.main.addRotation(angle, new Vector3D(1,1,1));
-			//ModelMatrix.main.addRotation(angle, player1.getDir());
-			shader.setModelMatrix(ModelMatrix.main.getMatrix());
-			player2.getModel().draw(shader, player2.getTex(),1);
-
-			ModelMatrix.main.popMatrix();
-
-			drawSkybox();
-			drawPyramids();
 		}
+	}
+
+	private void setLights() {
+		
+		shader.setSpotDirection(-cam.n.x, -cam.n.y, -cam.n.z, 0.0f);
+		shader.setSpotExponent(0.0f);
+		shader.setConstantAttenuation(1.0f);
+		shader.setLinearAttenuation(0.00f);
+		shader.setQuadraticAttenuation(0.00f);
+
+		shader.setLightColor(1.0f, 1.0f, 1.0f, 1.0f);
+		
+		shader.setGlobalAmbient(1.0f, 1.0f, 1.0f, 1);
+		
+	}
+
+	private void drawPlayer(Player player) {
+		
+		shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+		shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+		shader.setMaterialEmission(0, 0, 0, 1);
+		shader.setShininess(50.0f);
+
+		ModelMatrix.main.pushMatrix();
+		ModelMatrix.main.addTranslation(player.getPos().x, player.getPos().y, player.getPos().z);
+		ModelMatrix.main.addRotationY(player.getAngle());
+		shader.setModelMatrix(ModelMatrix.main.getMatrix());
+		player.getModel().draw(shader, player.getTex(),1);
+		ModelMatrix.main.popMatrix();
+		
 	}
 
 	@Override
