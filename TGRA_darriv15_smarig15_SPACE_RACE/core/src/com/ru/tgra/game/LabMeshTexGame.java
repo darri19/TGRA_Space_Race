@@ -22,9 +22,6 @@ import com.ru.tgra.graphics.shapes.*;
 import com.ru.tgra.graphics.shapes.g3djmodel.G3DJModelLoader;
 import com.ru.tgra.graphics.shapes.g3djmodel.MeshModel;
 
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
-
 public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor {
 
 	Shader shader;
@@ -132,10 +129,10 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 //		cam2.look(new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z-6) , new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z+4), new Vector3D(0,1,0));
 
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			player1.rotate(-1);
+			player1.rotate(-80 * deltaTime);
 			//cam.slide(-3.0f * deltaTime, 0, 0);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-			player1.rotate(1);
+			player1.rotate(80 * deltaTime);
 			//cam.slide(3.0f * deltaTime, 0, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -157,11 +154,11 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		}
 
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			player2.rotate(-1);
+			player2.rotate(-80 * deltaTime);
 			//cam.yaw(-90.0f * deltaTime);
 			//cam.rotateY(90.0f * deltaTime);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			player2.rotate(1);
+			player2.rotate(80 * deltaTime);
 			//cam.yaw(90.0f * deltaTime);
 			//cam.rotateY(-90.0f * deltaTime);
 		}
