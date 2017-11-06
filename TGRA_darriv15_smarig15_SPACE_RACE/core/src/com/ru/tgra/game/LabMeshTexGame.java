@@ -76,13 +76,16 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		tex = new Texture(Gdx.files.internal("textures/tex01.png"));
 		phobTex = new Texture(Gdx.files.internal("textures/phobos2k.png"));
 		
-		motion = new BezierMotion(new Point3D(-1,4,-1), new Point3D(1,6,1),
-								new Point3D(7,6,-4), new Point3D(1,3,1),
+		motion = new BezierMotion(new Point3D(-100,0,-100), new Point3D(-100,0,100),
+								new Point3D(100,0,100), new Point3D(100,0,-100),
 								3.0f, 7.0f);
 		
 		gates = new ArrayList<Gate>();
-		for(int i = 0; i < 8; i++){
-			
+		for(int i = 0; i < 80; i++){
+			Point3D pos = new Point3D();
+			System.out.println(3.0f+i*(4.0f/80.0f));
+			motion.getCurrentPos(3.0f+i*(4.0f/80.0f), pos);
+			gates.add(new Gate(pos, 0, ring, null));
 		}
 
 		player1 = new Player(new Point3D(1.0f,1.0f,1.0f), new Vector3D(0.0f,0.0f,1.0f), ship, null);
@@ -241,15 +244,24 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 				shader.setMaterialEmission(0, 0, 0, 1);
 				shader.setShininess(50.0f);
 				
-				float radius = 50f;
-				for(int i = 0; i < 8; i++){
-					float angle = (float) (i* Math.PI * 2.0 / 8);
-
+//				float radius = 50f;
+//				for(int i = 0; i < 8; i++){
+//					float angle = (float) (i* Math.PI * 2.0 / 8);
+//
+//					ModelMatrix.main.pushMatrix();
+//					ModelMatrix.main.addTranslation((float)Math.cos(angle)*radius, 0f, (float)Math.sin(angle)*radius);
+//					ModelMatrix.main.addRotationY((float)(-angle*180/Math.PI));
+//					shader.setModelMatrix(ModelMatrix.main.getMatrix());
+//					ring.draw(shader, phobTex, 5);
+//					ModelMatrix.main.popMatrix();
+//				}
+				
+				for(Gate g : gates){
 					ModelMatrix.main.pushMatrix();
-					ModelMatrix.main.addTranslation((float)Math.cos(angle)*radius, 0f, (float)Math.sin(angle)*radius);
-					ModelMatrix.main.addRotationY((float)(-angle*180/Math.PI));
+					ModelMatrix.main.addTranslation(g.getPos().x, g.getPos().y, g.getPos().z);
+					ModelMatrix.main.addRotationY(g.getAngle());
 					shader.setModelMatrix(ModelMatrix.main.getMatrix());
-					ring.draw(shader, phobTex, 5);
+					g.getModel().draw(shader, g.getTex(),5);
 					ModelMatrix.main.popMatrix();
 				}
 

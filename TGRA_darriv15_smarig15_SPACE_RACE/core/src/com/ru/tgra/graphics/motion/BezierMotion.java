@@ -21,6 +21,7 @@ public class BezierMotion {
 	}
 	
 	public void getCurrentPos(float currentTime, Point3D out_position){
+		System.out.println("hallo darri!");
 		
 		if(currentTime < startTime){
 			out_position.x = P1.x;
