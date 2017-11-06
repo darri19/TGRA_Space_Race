@@ -81,10 +81,9 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 								3.0f, 7.0f);
 		
 		gates = new ArrayList<Gate>();
-		for(int i = 0; i < 80; i++){
+		for(int i = 0; i < 50; i++){
 			Point3D pos = new Point3D();
-			System.out.println(3.0f+i*(4.0f/80.0f));
-			motion.getCurrentPos(3.0f+i*(4.0f/80.0f), pos);
+			motion.getCurrentPos(3.0f+i*(4.0f/50.0f), pos);
 			gates.add(new Gate(pos, 0, ring, null));
 		}
 
