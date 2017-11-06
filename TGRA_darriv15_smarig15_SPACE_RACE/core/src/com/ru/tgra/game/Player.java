@@ -2,14 +2,16 @@ package com.ru.tgra.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.ru.tgra.graphics.Color;
 import com.ru.tgra.graphics.Point3D;
 import com.ru.tgra.graphics.Vector3D;
 import com.ru.tgra.graphics.shapes.g3djmodel.MeshModel;
 
 public class Player {
 	
+	
 	private float speed;
-	private float topSpeed = 30;
+	private float topSpeed = 1000;
 	private float bottomSpeed = -5;
 	private Vector3D direction;
 	private Point3D position;
@@ -97,4 +99,28 @@ public class Player {
 	public void setNextGate(int gate){
 		nextGate = gate;
 	}
+	
+	public float getSpeed(){
+		return speed;
+	}
+	
+	public void checkCollisions(Player other){
+		
+		if(Math.sqrt( ( other.position.x-position.x ) * ( other.position.x-position.x )  + ( other.position.z-position.z ) * ( other.position.z-position.z ) ) < 5.3f){
+			float deltaSpeed1 = speed*Gdx.graphics.getDeltaTime();
+			float deltaSpeed2 = other.getSpeed()*Gdx.graphics.getDeltaTime();
+
+			float newVelX1 = (direction.x * deltaSpeed1 * (5 - 5) + (2 * 5 * other.direction.x *  deltaSpeed2)) / (5 + 5);
+			float newVelZ1 = (direction.z * deltaSpeed1 * (5 - 5) + (2 * 5 * other.direction.z *  deltaSpeed2)) / (5 + 5);
+			float newVelX2 = (other.direction.x *  deltaSpeed2 * (5 - 5) + (2 * 5 * direction.x * deltaSpeed1)) / (5 + 5);
+			float newVelZ2 = (other.direction.z *  deltaSpeed2 * (5 - 5) + (2 * 5 * direction.z * deltaSpeed1)) / (5 + 5);
+			
+			position.x += newVelX1;
+			position.z += newVelZ1;
+			other.position.x += newVelX2;
+			other.position.z += newVelZ2;
+		}
+		
+	}
+	
 }
