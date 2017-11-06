@@ -17,6 +17,7 @@ public class Player {
 	
 	private MeshModel model;
 	private Texture tex;
+	private int nextGate = 0;
 	
 	public Player(Point3D pos, Vector3D dir, MeshModel model, Texture tex){
 		this.position = pos;
@@ -87,5 +88,13 @@ public class Player {
 		this.direction.z = -xTemp * s + this.direction.z * c;
 		
 		this.direction.normalize();
+	}
+	
+	public int getNextGate(){
+		return nextGate;
+	}
+	
+	public void setNextGate(int gate){
+		nextGate = gate;
 	}
 }

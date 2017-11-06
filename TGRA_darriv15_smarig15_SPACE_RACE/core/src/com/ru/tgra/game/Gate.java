@@ -10,12 +10,14 @@ public class Gate {
 	float angle;
 	MeshModel model;
 	Texture tex;
+	float size;
 	
-	public Gate(Point3D pos, float angle, MeshModel model, Texture tex){
+	public Gate(Point3D pos, float angle, MeshModel model, Texture tex, float size){
 		this.pos = pos;
 		this.angle = angle;
 		this.model = model;
 		this.tex = tex;
+		this.size = size;
 	}
 	
 	public Point3D getPos(){
