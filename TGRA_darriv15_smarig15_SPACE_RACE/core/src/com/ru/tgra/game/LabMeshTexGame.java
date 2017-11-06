@@ -3,6 +3,7 @@ package com.ru.tgra.game;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -26,27 +27,32 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 
 	Shader shader;
 
-	private float angle = 0;
 
 	private Camera cam;
 	private Camera cam2;
-	//private Camera topCam;
 	
 	private float fov = 90.0f;
 
 	float currentTime;
 	boolean firstFrame = true;
+	
 
-	MeshModel sky;
 	MeshModel ship;
 	MeshModel ship2;
+	MeshModel ring;
+	
+	Texture tex;
 
 	Player player1;
 	Player player2;
 	
+	ArrayList<Gate> gates;
+	
+	
 	BezierMotion motion;
 
 	private Texture skyTex;
+	private Texture phobTex;
 	
 	Random rand = new Random();
 
@@ -60,15 +66,24 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 
 		shader = new Shader();
 
-		skyTex = new Texture(Gdx.files.internal("textures/spaceTex.png"));
+		skyTex = new Texture(Gdx.files.internal("textures/space3.jpg"));
 
-		sky = G3DJModelLoader.loadG3DJFromFile("space_less_detailed.g3dj", true);
+		//sky = G3DJModelLoader.loadG3DJFromFile("space_less_detailed.g3dj", true);
 		ship = G3DJModelLoader.loadG3DJFromFile("ship_proto.g3dj", true);
-		ship2 = G3DJModelLoader.loadG3DJFromFile("ship_proto.g3dj", true);
+		ship2 = G3DJModelLoader.loadG3DJFromFile("ship_proto2.g3dj", true);
+		ring = G3DJModelLoader.loadG3DJFromFile("gateUpdate.g3dj", true);
+
+		tex = new Texture(Gdx.files.internal("textures/tex01.png"));
+		phobTex = new Texture(Gdx.files.internal("textures/phobos2k.png"));
 		
-		/*motion = new BezierMotion(new Point3D(-1,4,-1), new Point3D(1,6,1),
+		motion = new BezierMotion(new Point3D(-1,4,-1), new Point3D(1,6,1),
 								new Point3D(7,6,-4), new Point3D(1,3,1),
-								3.0f, 7.0f);*/ 
+								3.0f, 7.0f);
+		
+		gates = new ArrayList<Gate>();
+		for(int i = 0; i < 8; i++){
+			
+		}
 
 		player1 = new Player(new Point3D(1.0f,1.0f,1.0f), new Vector3D(0.0f,0.0f,1.0f), ship, null);
 		player2 = new Player(new Point3D(6.0f,1.0f,1.0f), new Vector3D(0.0f,0.0f,1.0f), ship2, null);
@@ -123,11 +138,6 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 //			currentTime += Gdx.graphics.getRawDeltaTime();
 //		}
 
-		angle += 180.0f * deltaTime;
-		cam.look(new Point3D(player1.getPos().x - 6*player1.getDir().x, player1.getPos().y+5,player1.getPos().z-6*player1.getDir().z) , new Point3D(player1.getPos().x + 6*player1.getDir().x, player1.getPos().y,player1.getPos().z+ 6*player1.getDir().z), new Vector3D(0,1,0));
-		cam2.look(new Point3D(player2.getPos().x - 6*player2.getDir().x, player2.getPos().y+5,player2.getPos().z-6*player2.getDir().z) , new Point3D(player2.getPos().x + 6*player2.getDir().x, player1.getPos().y,player2.getPos().z+ 6*player2.getDir().z), new Vector3D(0,1,0));
-//		cam2.look(new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z-6) , new Point3D(player2.getPos().x, player2.getPos().y+3,player2.getPos().z+4), new Vector3D(0,1,0));
-
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
 			player1.rotate(-80 * deltaTime);
 			//cam.slide(-3.0f * deltaTime, 0, 0);
@@ -137,30 +147,17 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
 			player1.accelerateForward();
-			//cam.slide(0, 0, -3.0f * deltaTime);
-			//cam.walkForward(3.0f * deltaTime);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
 			player1.accelerateBack();
-			//cam.slide(0, 0, 3.0f * deltaTime);
-			//cam.walkForward(-3.0f * deltaTime);
 		}else{
 			player1.decelerate();
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.R)) {
-			//cam.slide(0, 3.0f * deltaTime, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.F)) {
-			//cam.slide(0, -3.0f * deltaTime, 0);
-		}
+		
 
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 			player2.rotate(-80 * deltaTime);
-			//cam.yaw(-90.0f * deltaTime);
-			//cam.rotateY(90.0f * deltaTime);
 		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 			player2.rotate(80 * deltaTime);
-			//cam.yaw(90.0f * deltaTime);
-			//cam.rotateY(-90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
 			player2.accelerateForward();
@@ -196,6 +193,10 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		//motion.getCurrentPos(currentTime, modelPosition);
 		player1.update();
 		player2.update();
+		
+		cam.look(new Point3D(player1.getPos().x - 6*player1.getDir().x, player1.getPos().y+5,player1.getPos().z-6*player1.getDir().z) , new Point3D(player1.getPos().x + 6*player1.getDir().x, player1.getPos().y,player1.getPos().z+ 6*player1.getDir().z), new Vector3D(0,1,0));
+		cam2.look(new Point3D(player2.getPos().x - 6*player2.getDir().x, player2.getPos().y+5,player2.getPos().z-6*player2.getDir().z) , new Point3D(player2.getPos().x + 6*player2.getDir().x, player1.getPos().y,player2.getPos().z+ 6*player2.getDir().z), new Vector3D(0,1,0));
+
 	}
 	
 	private void display()
@@ -203,11 +204,9 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		//do all actual drawing and rendering here
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+		//Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		// Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		//Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
 		//Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 
@@ -215,11 +214,20 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 		{
 			if(viewNum == 0)
 			{
+
 				Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
-				cam.perspectiveProjection(fov, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 0.2f, 100.0f);
+				cam.perspectiveProjection(fov, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 0.2f, 200.0f);
 				shader.setViewMatrix(cam.getViewMatrix());
 				shader.setProjectionMatrix(cam.getProjectionMatrix());
 				shader.setEyePosition(cam.eye.x, cam.eye.y, cam.eye.z, 1.0f);
+				
+
+				Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+				drawSkybox(player1);
+				Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+				Gdx.gl.glEnable(GL20.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				
 
 				ModelMatrix.main.loadIdentityMatrix();
 
@@ -228,16 +236,41 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 				drawPlayer(player1);
 				drawPlayer(player2);
 
-				drawSkybox();
+				shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+				shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+				shader.setMaterialEmission(0, 0, 0, 1);
+				shader.setShininess(50.0f);
+				
+				float radius = 50f;
+				for(int i = 0; i < 8; i++){
+					float angle = (float) (i* Math.PI * 2.0 / 8);
+
+					ModelMatrix.main.pushMatrix();
+					ModelMatrix.main.addTranslation((float)Math.cos(angle)*radius, 0f, (float)Math.sin(angle)*radius);
+					ModelMatrix.main.addRotationY((float)(-angle*180/Math.PI));
+					shader.setModelMatrix(ModelMatrix.main.getMatrix());
+					ring.draw(shader, phobTex, 5);
+					ModelMatrix.main.popMatrix();
+				}
+
+				
 				drawPyramids();
 			}
 			else
 			{
 				Gdx.gl.glViewport(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
-				cam2.perspectiveProjection(fov, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 3, 100);
+				cam2.perspectiveProjection(fov, (float)Gdx.graphics.getWidth() / (float)(2*Gdx.graphics.getHeight()), 0.2f, 200);
 				shader.setViewMatrix(cam2.getViewMatrix());
 				shader.setProjectionMatrix(cam2.getProjectionMatrix());
 				shader.setEyePosition(cam2.eye.x, cam2.eye.y, cam2.eye.z, 1.0f);
+				
+
+				Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+				drawSkybox(player2);
+				Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+				Gdx.gl.glEnable(GL20.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				
 
 				ModelMatrix.main.loadIdentityMatrix();
 
@@ -245,8 +278,29 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 				
 				drawPlayer(player1);
 				drawPlayer(player2);
+				shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+				shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+				shader.setMaterialEmission(0, 0, 0, 1);
+				shader.setShininess(50.0f);
+				
+				float radius = 50f;
+				for(int i = 0; i < 8; i++){
+					float angle = (float) (i* Math.PI * 2.0 / 8);
 
-				drawSkybox();
+					shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+					shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+					shader.setMaterialEmission(0, 0, 0, 1);
+					shader.setShininess(50.0f);
+					ModelMatrix.main.pushMatrix();
+					ModelMatrix.main.addTranslation((float)Math.cos(angle)*radius, 0f, (float)Math.sin(angle)*radius);
+					ModelMatrix.main.addRotationY((float)(-angle*180/Math.PI));
+					shader.setModelMatrix(ModelMatrix.main.getMatrix());
+					ring.draw(shader, null, 5);
+					ModelMatrix.main.popMatrix();
+				}
+				
+				
+
 				drawPyramids();
 			}
 
@@ -294,12 +348,13 @@ public class LabMeshTexGame extends ApplicationAdapter implements InputProcessor
 
 	}
 	
-	private void drawSkybox(){
+	private void drawSkybox(Player player){
 		
 		ModelMatrix.main.pushMatrix();
-		ModelMatrix.main.addTranslation(0,0,0);
+		ModelMatrix.main.addTranslation(player.getPos().x, player.getPos().y, player.getPos().z);
+		ModelMatrix.main.addScale(10,10,10);
 		shader.setModelMatrix(ModelMatrix.main.getMatrix());
-		sky.draw(shader, skyTex,100);
+		SphereGraphic.drawSolidSphere(shader, skyTex);
 	}
 
 	private void drawPyramids()

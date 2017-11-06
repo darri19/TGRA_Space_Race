@@ -87,8 +87,5 @@ public class Player {
 		this.direction.z = -xTemp * s + this.direction.z * c;
 		
 		this.direction.normalize();
-//
-//		u.set(t.x * c - n.x * s, t.y * c - n.y * s, t.z * c - n.z * s);
-//		n.set(t.x * s + n.x * c, t.y * s + n.y * c, t.z * s + n.z * c);
 	}
 }
