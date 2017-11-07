@@ -12,6 +12,7 @@ public class BSplineMotion {
 	ArrayList<BezierMotion> motions;
 	float startTime;
 	float endTime;
+	Vector3D firstVector;
 	
 	public BSplineMotion(ArrayList<Point3D> controlPoints, float startTime, float endTime){
 		this.startTime = startTime;
@@ -50,25 +51,51 @@ public class BSplineMotion {
 		}
 		
 		pEnd = p4;
+		
+		firstVector = this.getDerived(startTime);
 	}
 	
 	public void getCurrentPos(float currentTime, Point3D out_position){
 		
 		if(currentTime < startTime){
+			System.out.println("NOOO1");
 			out_position.x = pStart.x;
 			out_position.y = pStart.y;
 			out_position.z = pStart.z;
 		}else if(currentTime > endTime){
+			System.out.println("NOOO2");
 			out_position.x = pEnd.x;
 			out_position.y = pEnd.y;
 			out_position.z = pEnd.z;
 		}else{
 			for(BezierMotion motion : motions){
-				if(motion.startTime < currentTime && currentTime < motion.endTime){
+				if(motion.startTime <= currentTime && currentTime < motion.endTime){
 					motion.getCurrentPos(currentTime, out_position);
 					break; 
 				}
 			}
+		}
+	}
+	
+	public float getCurrentAngle(float currentTime){
+		Vector3D thingy = getDerived(currentTime);
+		
+		
+		return (float)Math.acos(thingy.dot(firstVector));
+	}
+	
+	public Vector3D getDerived(float currentTime){
+		if(currentTime < startTime){
+			return new Vector3D(1.0f,0,0);
+		}else if(currentTime > endTime){
+			return new Vector3D(-1.0f,0,0);
+		}else{
+			for(BezierMotion motion : motions){
+				if(motion.startTime <= currentTime && currentTime < motion.endTime){
+					return motion.getDerived(currentTime); 
+				}
+			}
+			return null;
 		}
 	}
 }

@@ -14,16 +14,18 @@ public class Gate {
 	float size;
 	
 	Color color;
+	int numberOfGate;
 	int timesTraversed = 0;
 	
 	
-	public Gate(Point3D pos, float angle, MeshModel model, Texture tex, float size, Color color){
+	public Gate(Point3D pos, float angle, MeshModel model, Texture tex, float size, Color color, int numOfGate){
 		this.pos = pos;
 		this.angle = angle;
 		this.model = model;
 		this.tex = tex;
 		this.size = size;
 		this.color = color;
+		this.numberOfGate = numOfGate;
 	}
 	
 	public Point3D getPos(){
@@ -42,9 +44,10 @@ public class Gate {
 		return tex;
 	}
 	
-	public boolean traversing(Point3D obj){
-		if(obj.x < pos.x+size && obj.x > pos.x-size &&
-		   obj.z < pos.z+size && obj.z > pos.z-size	){
+	public boolean traversing(Player player){
+		if(player.getNextGate() == this.numberOfGate && player.getPos().x < pos.x+1.5*size && player.getPos().x > pos.x-1.5*size &&
+				player.getPos().z < pos.z+1.5*size && player.getPos().z > pos.z-1.5*size){
+			player.setNextGate(player.getNextGate()+1);
 			return true;
 		}
 		else{

@@ -11,7 +11,7 @@ public class Player {
 	
 	
 	private float speed;
-	private float topSpeed = 1000;
+	private float topSpeed = 100;
 	private float bottomSpeed = -5;
 	private Vector3D direction;
 	private Point3D position;
@@ -65,16 +65,16 @@ public class Player {
 
 	public void accelerateBack(){
 		if(speed >= bottomSpeed)
-			speed -= 0.5f;
+			speed -= 2.5f;
 	}
 	
 	public void decelerate(){
 		if((speed < 0.2 && speed > 0) || (speed > -0.2 && speed < 0)){
 			speed = 0;
 		}else if(speed > 0){
-			speed -= 0.1;
+			speed -= 0.5;
 		}else if(speed < 0){
-			speed += 0.1;
+			speed += 0.5;
 		}
 	}
 	
